@@ -41,11 +41,11 @@ const authenticateUser = (req, res, next) => {
            // will have access to the user's information.
            //I learned about the req.originalUrl property from:
            //https://expressjs.com/en/api.html
-            if (req.originalUrl.includes('courses')) {
-              req.body.userId = user.id;
-            } else if (req.originalUrl.includes('users')) {
-              req.body.id = user.id;
-            }
+           if (req.originalUrl.includes('users')) {
+             req.body.id = user.id;
+           } else if (req.originalUrl.includes('courses')) {
+             req.body.userId = user.id;
+           }
           next();
           } else {
             //If the passwords do not match, return a response with a 401

@@ -41,9 +41,9 @@ const authenticateUser = (req, res, next) => {
            // will have access to the user's information.
            //I learned about the req.originalUrl property from:
            //https://expressjs.com/en/api.html
-           if (req.originalUrl.includes('users')) {
+           if (req.originalUrl === '/api/users') {
              req.body.id = user.id;
-           } else if (req.originalUrl.includes('courses')) {
+           } else if (req.originalUrl.substring(0, 12) === '/api/courses') {
              req.body.userId = user.id;
            }
           next();

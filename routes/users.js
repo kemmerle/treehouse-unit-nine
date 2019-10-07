@@ -4,7 +4,6 @@
 const express = require('express');
 const router = express.Router();
 const morgan = require('morgan');
-const { check, validationResult } = require('express-validator');
 const bcryptjs = require('bcryptjs');
 const auth = require('basic-auth');
 
@@ -22,6 +21,7 @@ const db = require('../models');
 const User = db.User;
 
 router.get('/users', authenticateUser, async (req, res) => {
+  console.log(typeof req.originalUrl)
    const user = await User.findByPk(req.body.id, {
      attributes: ['id', 'firstName', 'lastName', 'emailAddress']
    });

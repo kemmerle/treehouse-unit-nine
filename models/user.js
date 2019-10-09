@@ -34,12 +34,18 @@ module.exports = (sequelize, DataTypes) => {
     emailAddress: {
      type: DataTypes.STRING,
      allowNull: false,
+     //This Sequelize GitHub thread was very helpful in creating an error message
+     //for the unique constraint: https://github.com/sequelize/sequelize/issues/5033
+     unique: {args: true, msg: 'This email address is claimed'},
      validate: {
       notNull: {
         msg: 'Please provide an email',
       },
       notEmpty: {
         msg: 'Please provide an email',
+      },
+      isEmail: {
+        msg: 'Please enter a valid email',
       },
      },
    },

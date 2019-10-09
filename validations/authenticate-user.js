@@ -10,8 +10,6 @@ const User = db.User;
 //The authenticateUser middleware function has been adapted from the 'REST API
 //Authentication with Express' Treehouse course.
 const authenticateUser = (req, res, next) => {
-  let message = null;
-
   //Parse the user's credentials from the Authorization header.
   const credentials = auth(req);
 

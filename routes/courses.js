@@ -26,7 +26,8 @@ router.get('/courses', async (req, res, next) => {
         as: 'User',
         attributes: ['id', 'firstName', 'lastName']
       }
-    ]
+    ],
+    attributes: { exclude: ['createdAt', 'updatedAt'] }
   });
   res.json(courses)
      .status(200).end();
@@ -39,7 +40,8 @@ router.get('/courses/:id', async (req, res, next) => {
         as: 'User',
         attributes: ['id', 'firstName', 'lastName']
       }
-    ]
+    ],
+    attributes: { exclude: ['createdAt', 'updatedAt'] }
   });
 
   if (course === null) {
@@ -56,8 +58,8 @@ router.post('/courses', authenticateUser, async (req, res, next) => {
      res.location(`/api/courses/${course.id}`);
      res.status(201).end();
    } catch(err) {
-     if (err.name === "SequelizeValidationError" || "SequelizeUniqueConstraintError") {
-       res.status(400).json({error: err.message});
+     if (err.name === "SequelizeValidationError") {
+       res.status(400).json({ error: err.message });
      } else {
        return next(err);
      }
@@ -66,16 +68,20 @@ router.post('/courses', authenticateUser, async (req, res, next) => {
 
 router.put('/courses/:id', authenticateUser, async (req, res, next) => {
   try {
-    if (req.body.title && req.body.description) {
-      const course = await Course.findByPk(req.params.id)
-      if (course === null) {
-        res.status(404).json({message: "This course does not exist"});
-      } else {
-        await course.update(req.body);
-        res.status(204).end();
+    const course = await Course.findByPk(req.params.id)
+    if (req.body.userId === course.userId) {
+      if (req.body.title && req.body.description) {
+        if (course === null) {
+          res.status(404).json({ message: "This course does not exist" });
+        } else {
+          await course.update(req.body);
+          res.status(204).end();
+        }
+      } else if (!req.body.title || !req.body.description) {
+        res.status(400).json({ message: "Bad Request" })
       }
-    } else if (!req.body.title || !req.body.description) {
-      res.status(400).json({ message: "Bad Request" })
+    } else {
+      res.status(403).json({ message: "Forbidden" });
     }
   } catch(err) {
     return next(err);
@@ -85,11 +91,15 @@ router.put('/courses/:id', authenticateUser, async (req, res, next) => {
 router.delete('/courses/:id', authenticateUser, async (req, res, next) => {
   try {
     const course = await Course.findByPk(req.params.id);
-    if (course === null) {
-      res.status(404).json({message: "This course does not exist"});
+    if (req.body.userId === course.userId) {
+      if (course === null) {
+        res.status(404).json({ message: "This course does not exist" });
+      } else {
+        await course.destroy();
+        res.status(204).end();
+      }
     } else {
-      await course.destroy();
-      res.status(204).end();
+      res.status(403).json({ message: "Forbidden" });
     }
   } catch(err) {
     return next(err);

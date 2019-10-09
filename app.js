@@ -10,9 +10,11 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 // create the Express app
 const app = express();
 
+//Import folders with the routes for '/api/users' and '/api/courses'
 const userRoutes = require('./routes/users.js');
 const courseRoutes = require('./routes/courses.js')
 
+//Import database, so I can test my connection to my database and sync my data. 
 const db = require('./models');
 const sequelize = require('./models').sequelize;
 
@@ -64,6 +66,7 @@ app.use((err, req, res, next) => {
 app.set('port', process.env.PORT || 5000);
 
 // start listening on our port
+//sync our database with our app.
 const server = app.listen(app.get('port'), () => {
   db.sequelize.sync();
   console.log(`Express server is listening on port ${server.address().port}`);

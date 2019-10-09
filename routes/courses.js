@@ -66,19 +66,19 @@ router.post('/courses', authenticateUser, async (req, res, next) => {
 
 router.put('/courses/:id', authenticateUser, async (req, res, next) => {
   try {
-    const course = await Course.findByPk(req.params.id)
-    if (course === null) {
-      res.status(404).json({message: "This course does not exist"});
-    } else {
-      await course.update(req.body);
-      res.status(204).end();
+    if (req.body.title && req.body.description) {
+      const course = await Course.findByPk(req.params.id)
+      if (course === null) {
+        res.status(404).json({message: "This course does not exist"});
+      } else {
+        await course.update(req.body);
+        res.status(204).end();
+      }
+    } else if (!req.body.title || !req.body.description) {
+      res.status(400).json({ message: "Bad Request" })
     }
   } catch(err) {
-    if (err.name === "SequelizeValidationError" || "SequelizeUniqueConstraintError") {
-      res.status(400).json({error: err.message})
-    } else {
-      return next(err);
-    }
+    return next(err);
   }
 });
 
